@@ -1,0 +1,24 @@
+Remembers created useres
+list all events
+build a schedule
+info on park
+do not press
+
+remembers created users- 
+
+
+list all events - iterate through data and return the parades, shows, and tours classes
+each option will give you each instance of the class
+all instances will show the show or parade with a picture describing it 
+
+build a schedule-
+schedule will start as an empty array
+user will select through classes to get to the instances and press a button to add them to their schedule
+
+info on park
+takes you straight to a description of the origins of the park and maybe pictures
+
+do not press-
+dont fucking press 
+
+
