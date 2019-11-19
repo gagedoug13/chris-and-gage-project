@@ -8,7 +8,7 @@ class Cli
         
         
         guest_list = Guest.all.map {|guest| guest.name}
-        guest_select = PROMPT.select("Select a user", (guest_list))
+        guest_select = PROMPT.select("Select a user", (guest_list), active_color: :cyan)
         @guest = Guest.all.find {|guest| guest.name == guest_select}
         puts "Welcome back, #{@guest.name}."
         menu
@@ -33,31 +33,38 @@ class Cli
     Welcome to Halloween Hallows.
         
         "
-        choice = PROMPT.select("Have you been here before?", "Yes", "No", "Maybe", active_color: :cyan)
+        choice = PROMPT.select("Have you been here before?", "Yes", "No", "Maybe", "Exit", active_color: :cyan)
             if choice == "Yes"
                 # puts "Please choose your username from this list"
                 existing_guest
             elsif choice == "No"
                 new_guest
-            else choice == "Maybe"
+            elsif choice == "Maybe"
                 puts "Bitch no you haven't." 
-                new_guest 
+                new_guest
+            else choice == "Exit"
+                exit     
             end       
         #puts "welcome #{@guest.name}"
         menu
     end
     
     def menu
-        choice = PROMPT.select("Select an option", "Build Schedule", "View Schedule", "Park Info", "DO NOT PUSH!", active_color: :cyan)
+        choice = PROMPT.select("Select an option", "Build Schedule", "View Schedule", "Park Info", "DO NOT PUSH!", "<- Welcome Menu", "EXIT", active_color: :cyan)
             if choice == "Build Schedule"
                 build_schedule
             elsif choice == "View Schedule"
                 view_schedule
             elsif choice == "Park Info"
                 park_info
-            else choice == "DO NOT PUSH!"
+            elsif choice == "DO NOT PUSH!"
                 do_not_push
+            elsif choice == "<- Welcome Menu"
+                start 
+            else choice == "EXIT"
+                exit 
             end
+
     end 
 
     def build_schedule
@@ -72,7 +79,7 @@ class Cli
     end
     
     def event_list_by_day
-       choice = PROMPT.select("Which day would you like to attend?", "Monday", "Tuesday", "Wednesday", "Thursday")
+       choice = PROMPT.select("Which day would you like to attend?", "Monday", "Tuesday", "Wednesday", "Thursday", active_color: :cyan)
         if choice == "Monday"
             monday_events = Event.all.select {|event| event.day == "Monday"}
             choice = PROMPT.select("Select an event!", (monday_events.map {|day| day.title}))
@@ -86,11 +93,13 @@ class Cli
             thursday_events = Event.all.select {|event| event.day == "Thursday"}
             choice = PROMPT.select("Select an event!", (thursday_events.map {|day| day.title}))
         end
+        puts `clear`
         Schedule.create(event_id: Event.find_by(title: choice).id, guest_id: @guest.id)
+        view_schedule
     end
     
     def event_list_by_type
-        choice = PROMPT.select("What type of event are you in the mood for?", "Parade", "Show")
+        choice = PROMPT.select("What type of event are you in the mood for?", "Parade", "Show", active_color: :cyan)
         if choice == "Parade"
             parades = Event.all.select {|event| event.event_type == "parade"}
             choice = PROMPT.select("Select a Parade!", (parades.map {|parade| parade.title}))
@@ -98,11 +107,13 @@ class Cli
             shows = Event.all.select {|event| event.event_type == "show"}
             choice = PROMPT.select("Select a Show!", (shows.map {|show| show.title}))
         end
+        puts `clear`
         Schedule.create(event_id: Event.find_by(title: choice).id, guest_id: @guest.id)
+        view_schedule
     end
 
     def event_list_by_location
-        choice = PROMPT.select("Choose a location in the park?", "Death Valley", "Grimland", "Wicked City", "Monsterville", "Ghost Town")
+        choice = PROMPT.select("Choose a location in the park?", "Death Valley", "Grimland", "Wicked City", "Monsterville", "Ghost Town", active_color: :cyan)
         if choice == "Death Valley"
             deathvalley_loc = Event.all.select {|event| event.location == "Death Valley"}
             choice = PROMPT.select("Select an event!", (deathvalley_loc.map {|day| day.title}))
@@ -119,33 +130,47 @@ class Cli
             ghosttown_loc = Event.all.select {|event| event.location == "Ghost Town"}
             choice = PROMPT.select("Select an event!", (ghosttown_loc.map {|day| day.title}))
         end
+        puts `clear`
         Schedule.create(event_id: Event.find_by(title: choice).id, guest_id: @guest.id)
-        binding.pry
+        view_schedule
+        
     end
 
     def park_info
-        puts "
         
+        choice = PROMPT.select("
         
-        This park is embedded with many Shows and Parades to attend. Choose wisely!
+    This park is embedded with many Shows and Parades to attend. Choose wisely!
         
-        
-        
-        
-        
-        "
+        ", "Build my Schedule", "This Place Sucks", active_color: :cyan)
+            if choice == "Build my Schedule"
+                build_schedule 
+            else choice == "This Place Sucks"
+                do_not_push      
+            end     
+
     end
 
     def view_schedule
+        @guest.reload
+        puts "
+        
+        Here are your current events!
+        
+        "
         @guest.schedules.each { |schedule| puts schedule.event.title }
+        
+        
+        menu
     end
 
     def do_not_push
         puts "
         
-    YOU UGLY
+    YOU'LL DIE ALONE AND YOUR MOM HATES YOU
         
         
          "
+         menu
     end
 end

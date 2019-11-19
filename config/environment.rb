@@ -10,4 +10,7 @@ ActiveRecord::Base.establish_connection(
     database: 'db/Halloween_Hallows.db'     
 )
 
+ActiveRecord::Base.logger = nil
+
+
 
